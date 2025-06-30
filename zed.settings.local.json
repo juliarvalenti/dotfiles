@@ -1,0 +1,25 @@
+{
+  "git": {
+    "enabled": true,
+    "git_gutter": "tracked_files"
+  },
+  "file_scan_exclusions": [
+    "**/.git",
+    "**/.DS_Store",
+    "**/node_modules",
+    "**/.next",
+    "**/.venv",
+    "**/.mypy_cache",
+    "**/__pycache__",
+    "**/dist",
+    "**/build",
+    "**/.cache",
+    "**/coverage",
+    "**/*.log",
+    "**/.turbo",
+    "**/.tmp_dagster_home_*",
+    "services/dagster/.tmp*",
+    "**/*.egg-info"
+  ],
+  "projects_online_by_default": false
+}

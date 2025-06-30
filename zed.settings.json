@@ -1,0 +1,68 @@
+{
+  "icon_theme": "Colored Zed Icons Theme Light",
+  "tabs": {
+    "file_icons": true,
+    "show_diagnostics": "all",
+    "show_close_button": "hover"
+  },
+  "project_panel": {
+    "show_diagnostics": "all",
+    "default_width": 240,
+    "dock": "left"
+  },
+  "scrollbar": {
+    "diagnostics": "all",
+    "show": "auto"
+  },
+  "diagnostics": {
+    "inline": {
+      "enabled": true,
+      "update_debounce_ms": 150
+    }
+  },
+  "agent": {
+    "always_allow_tool_actions": true,
+    "model_parameters": [],
+    "default_model": {
+      "provider": "copilot_chat",
+      "model": "gpt-4.1"
+    },
+    "version": "2"
+  },
+  "context_servers": {
+    "deepwiki-mcp-server": {
+      "source": "custom",
+      "command": {
+        "path": "node",
+        "args": [
+          "/Users/juliavalenti/Documents/GitHub/polaris/services/deepwiki-mcp-server/dist/server.js",
+          "--stdio"
+        ],
+        "env": {}
+      }
+    },
+    "mcp-server-github": {
+      "source": "extension",
+      "settings": {
+        "github_personal_access_token": "REDACTED"
+      }
+    }
+  },
+  "base_keymap": "VSCode",
+  "ui_font_size": 16,
+  "theme": {
+    "mode": "system",
+    "light": "Gruvbox Light Hard",
+    "dark": "One Dark"
+  },
+  "buffer_font_family": "MesloLGS Nerd Font",
+  "buffer_font_size": 12,
+  "terminal": {
+    "font_family": "MesloLGS Nerd Font",
+    "font_size": 12
+  },
+  "file_scan_inclusions": [".zed", ".env", ".github"],
+  "features": {
+    "edit_prediction_provider": "copilot"
+  }
+}
