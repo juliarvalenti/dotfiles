@@ -1,0 +1,123 @@
+{
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/juliavalenti/.claude/hooks/peon-ping/peon.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/juliavalenti/.claude/hooks/peon-ping/peon.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/juliavalenti/.claude/hooks/peon-ping/peon.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/juliavalenti/.claude/hooks/peon-ping/peon.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PermissionRequest": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/juliavalenti/.claude/hooks/peon-ping/peon.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  },
+  "enabledPlugins": {
+    "clangd-lsp@claude-plugins-official": true,
+    "pyright-lsp@claude-plugins-official": true
+  },
+  "effortLevel": "medium",
+  "spinnerVerbs": {
+    "mode": "replace",
+    "verbs": [
+      "『Ｔｒａｎｓｃｅｎｄｉｎｇ』",
+      "░▒▓ Ascending ▓▒░",
+      "✦ Ｄｒｅａｍｉｎｇ ✦",
+      "【Ｆｌｏａｔｉｎｇ】",
+      "▶ Vaporizing ◀",
+      "〔Ｄｉｓｓｏｌｖｉｎｇ〕",
+      "◈ Melting ◈",
+      "※ Ｒｅｆｒａｃｔｉｎｇ ※",
+      "▓▒░ Glitching ░▒▓",
+      "『Ｂｕｆｆｅｒｉｎｇ』",
+      "✦ Channel Surfing ✦",
+      "【Ｄｅｆｒａｇｍｅｎｔｉｎｇ】",
+      "░▒▓ Rendering Palm Trees ▓▒░",
+      "〔Ｌｏａｄｉｎｇ　Ｓｕｎｓｅｔ〕",
+      "◆ Dialing Up ◆",
+      "『Ｐｌｅａｓｅ　Ｗａｉｔ　Ｗａｒｍｌｙ』",
+      "▶ Synthesizing ◀",
+      "※ Retrograding ※",
+      "◈ Ｃｈｉｌｌｉｎｇ ◈",
+      "【Ｍａｌｌ　Ｗａｌｋｉｎｇ】",
+      "░▒▓ Elevator Music Intensifies ▓▒░",
+      "✦ Ｌａｔｅ　Ｎｉｇｈｔ　Ｌｏ－Ｆｉ ✦",
+      "『Windows 95 Booting』",
+      "〔Nostalgia Loading〕",
+      "◆ Ｆｅｅｌｉｎｇ　Ｉｔ ◆",
+      "▶ Accessing Mainframe ◀",
+      "【Ｍａｃｉｎｔｏｓｈ　Ｐｌｕｓ】",
+      "※ Entering the Void ※",
+      "▓▒░ Rebooting Reality ░▒▓",
+      "『Ｄｏｗｎｌｏａｄｉｎｇ　Ｍｏｒｅ　ＲＡＭ』",
+      "✦ Connecting to AOL ✦",
+      "◈ Ｙ２Ｋ　Ｃｏｍｐｌｉａｎｔ ◈",
+      "【Please Enjoy The Music】",
+      "〔Installing Bonzi Buddy〕",
+      "◆ Running on Emotions ◆",
+      "▶ Ｏｐｅｎｉｎｇ　Ｌｉｍｅｗｉｒｅ ◀",
+      "『ＶＨＳ　Ｔｒａｃｋｉｎｇ』",
+      "※ Inserting Coin ※",
+      "░▒▓ Playing It Cool ▓▒░",
+      "【Ｔｏｕｃｈｉｎｇ　ｔｈｅ　Ｓｋｙ】",
+      "✦ Ｉｎ　ｔｈｅ　Ｚｏｎｅ ✦"
+    ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "npx -y ccstatusline@latest",
+    "padding": 0
+  }
+}

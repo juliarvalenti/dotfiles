@@ -1,0 +1,69 @@
+{
+  "version": 3,
+  "lines": [
+    [
+      {
+        "id": "1",
+        "type": "model",
+        "color": "brightGreen",
+        "backgroundColor": "bgMagenta"
+      },
+      {
+        "id": "3",
+        "type": "context-length",
+        "color": "brightGreen",
+        "backgroundColor": "bgCyan"
+      },
+      {
+        "id": "8fa528bc-09c5-4ccd-906d-bb62d56e0384",
+        "type": "context-percentage-usable",
+        "backgroundColor": "bgBrightRed",
+        "color": "brightGreen"
+      },
+      {
+        "id": "5",
+        "type": "git-branch",
+        "color": "brightGreen",
+        "backgroundColor": "bgMagenta"
+      },
+      {
+        "id": "7",
+        "type": "git-changes",
+        "color": "brightGreen"
+      }
+    ],
+    [
+      {
+        "id": "41dd2498-92b6-4ab4-9f1f-c2f773a7e790",
+        "type": "custom-command",
+        "commandPath": "~/.claude/spotify.sh",
+        "color": "brightGreen"
+      },
+      {
+        "id": "452c96d0-8162-4803-b41b-5605e20b6cf7",
+        "type": "current-working-dir",
+        "color": "cyan"
+      }
+    ],
+    []
+  ],
+  "flexMode": "full",
+  "compactThreshold": 60,
+  "colorLevel": 2,
+  "defaultPadding": " ",
+  "inheritSeparatorColors": false,
+  "globalBold": false,
+  "powerline": {
+    "enabled": true,
+    "separators": [
+      ""
+    ],
+    "separatorInvertBackground": [
+      false
+    ],
+    "startCaps": [],
+    "endCaps": [],
+    "theme": "custom",
+    "autoAlign": false
+  }
+}
