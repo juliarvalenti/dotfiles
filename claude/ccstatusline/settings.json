@@ -3,22 +3,10 @@
   "lines": [
     [
       {
-        "id": "1",
-        "type": "model",
-        "color": "brightGreen",
-        "backgroundColor": "bgMagenta"
-      },
-      {
-        "id": "3",
-        "type": "context-length",
+        "id": "452c96d0-8162-4803-b41b-5605e20b6cf7",
+        "type": "current-working-dir",
         "color": "brightGreen",
         "backgroundColor": "bgCyan"
-      },
-      {
-        "id": "8fa528bc-09c5-4ccd-906d-bb62d56e0384",
-        "type": "context-percentage-usable",
-        "backgroundColor": "bgBrightRed",
-        "color": "brightGreen"
       },
       {
         "id": "5",
@@ -29,7 +17,46 @@
       {
         "id": "7",
         "type": "git-changes",
-        "color": "brightGreen"
+        "color": "brightGreen",
+        "backgroundColor": "bgMagenta"
+      }
+    ],
+    [
+      {
+        "id": "1",
+        "type": "model",
+        "color": "brightGreen",
+        "backgroundColor": "bgBlue"
+      },
+      {
+        "id": "3",
+        "type": "context-length",
+        "color": "brightGreen",
+        "merge": true
+      },
+      {
+        "id": "8fa528bc-09c5-4ccd-906d-bb62d56e0384",
+        "type": "context-percentage-usable",
+        "color": "brightGreen",
+        "rawValue": true
+      },
+      {
+        "id": "5h-block-timer",
+        "type": "block-timer",
+        "color": "brightGreen",
+        "merge": "no-padding",
+        "metadata": {
+          "display": "time"
+        }
+      },
+      {
+        "id": "5h-block-progress",
+        "type": "block-timer",
+        "color": "brightGreen",
+        "rawValue": true,
+        "metadata": {
+          "display": "progress-short"
+        }
       }
     ],
     [
@@ -38,14 +65,8 @@
         "type": "custom-command",
         "commandPath": "~/.claude/spotify.sh",
         "color": "brightGreen"
-      },
-      {
-        "id": "452c96d0-8162-4803-b41b-5605e20b6cf7",
-        "type": "current-working-dir",
-        "color": "cyan"
       }
-    ],
-    []
+    ]
   ],
   "flexMode": "full",
   "compactThreshold": 60,
@@ -55,12 +76,8 @@
   "globalBold": false,
   "powerline": {
     "enabled": true,
-    "separators": [
-      ""
-    ],
-    "separatorInvertBackground": [
-      false
-    ],
+    "separators": ["\ue0b0", "\ue0b0", "\ue0b0"],
+    "separatorInvertBackground": [false, false, false],
     "startCaps": [],
     "endCaps": [],
     "theme": "custom",
