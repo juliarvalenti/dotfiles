@@ -9,6 +9,7 @@ Personal config and keybindings.
 | `vscode/` | VS Code keybindings |
 | `zed/` | Zed editor settings |
 | `claude/` | Claude Code keybindings and status line config |
+| `herdr/` | herdr terminal workspace keybindings |
 | `fastfetch/` | fastfetch config |
 | `ghostty-config` | Ghostty terminal config |
 | `old/` | Legacy backups |

@@ -1,0 +1,16 @@
+# herdr config — overrides only; anything omitted uses herdr's defaults.
+# Lives at ~/.config/herdr/config.toml
+
+[keys]
+# Leader key. ctrl+a is far easier to reach than the default ctrl+b.
+# Press ctrl+a, release, then the command key.
+prefix = "ctrl+a"
+
+# Move between spaces (the left-nav entries) with the arrow keys.
+# Hammerspoon already maps ctrl+i -> Up and ctrl+k -> Down globally, so in
+# practice this is: ctrl+a, then ctrl+i (up the list) / ctrl+k (down the list).
+previous_workspace = "prefix+up"
+next_workspace     = "prefix+down"
+
+# Close the current space (asks for confirmation by default).
+close_workspace = "prefix+ctrl+w"
