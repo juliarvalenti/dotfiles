@@ -1,29 +1,37 @@
 # herdr config — overrides only; anything omitted uses herdr's defaults.
+#
+# ── Unified keymap ──────────────────────────────────────────────────────────
+# Prefix: ctrl+a (hold ctrl the whole time; the rest are ctrl chords too).
+#
+# NAVIGATE — the compass (direction = what you move):
+#   ctrl+i / ctrl+k  → prev / next SPACE   (↑ / ↓)
+#   ctrl+j / ctrl+l  → prev / next TAB     (← / →)
+#   (Hammerspoon maps ctrl+i/k/j/l to the arrow keys globally.)
+#
+# ACT — verb = letter, scope = shift:
+#   n = new,  r = rename,  w = close
+#   no shift → acts on the TAB (small),  shift → acts on the WORKSPACE (big)
+# ─────────────────────────────────────────────────────────────────────────────
 
 [keys]
-# Leader key. ctrl+a is far easier to reach than the default ctrl+b.
-# Press ctrl+a, release, then the command key.
 prefix = "ctrl+a"
 
-# Move between spaces (the left-nav entries) with the arrow keys.
-# Hammerspoon already maps ctrl+i -> Up and ctrl+k -> Down globally, so in
-# practice this is: ctrl+a, then ctrl+i (up the list) / ctrl+k (down the list).
-previous_workspace = "prefix+up"
-next_workspace     = "prefix+down"
+# Navigate
+previous_workspace = "prefix+up"      # ctrl+i
+next_workspace     = "prefix+down"    # ctrl+k
+previous_tab       = "prefix+left"    # ctrl+j
+next_tab           = "prefix+right"   # ctrl+l
 
-# Move between tabs with left/right arrows — completes the compass:
-# up/down = spaces, left/right = tabs. Hammerspoon maps ctrl+j -> Left and
-# ctrl+l -> Right, so in practice: ctrl+a, then ctrl+j (prev tab) / ctrl+l (next tab).
-previous_tab = "prefix+left"
-next_tab     = "prefix+right"
+# Act on a TAB (no shift)
+new_tab    = "prefix+ctrl+n"
+rename_tab = "prefix+ctrl+r"
+close_tab  = "prefix+ctrl+w"
 
-# ctrl+w closes the *tab* (the short-lived thing), matching browser/editor muscle
-# memory. Closing a whole workspace stays on herdr's default prefix+shift+d —
-# deliberate and rarely hit, so a reflexive ctrl+w can't nuke a long-lived space.
-close_tab = "prefix+ctrl+w"
+# Act on a WORKSPACE (shift = the bigger thing)
+new_workspace    = "prefix+ctrl+shift+n"
+rename_workspace = "prefix+ctrl+shift+r"
+close_workspace  = "prefix+ctrl+shift+w"
 
 [session]
-# After a herdr server (or Mac) restart, resume supported agent panes back into
-# their native conversation sessions instead of dead shell prompts. Relies on
-# official integrations that report session refs (claude does).
+# After a restart, resume supported agent panes back into their conversations.
 resume_agents_on_restore = true
