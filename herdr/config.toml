@@ -21,3 +21,9 @@ next_tab     = "prefix+right"
 # memory. Closing a whole workspace stays on herdr's default prefix+shift+d —
 # deliberate and rarely hit, so a reflexive ctrl+w can't nuke a long-lived space.
 close_tab = "prefix+ctrl+w"
+
+[session]
+# After a herdr server (or Mac) restart, resume supported agent panes back into
+# their native conversation sessions instead of dead shell prompts. Relies on
+# official integrations that report session refs (claude does).
+resume_agents_on_restore = true
