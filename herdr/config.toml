@@ -1,5 +1,4 @@
 # herdr config — overrides only; anything omitted uses herdr's defaults.
-# Lives at ~/.config/herdr/config.toml
 
 [keys]
 # Leader key. ctrl+a is far easier to reach than the default ctrl+b.
@@ -11,6 +10,12 @@ prefix = "ctrl+a"
 # practice this is: ctrl+a, then ctrl+i (up the list) / ctrl+k (down the list).
 previous_workspace = "prefix+up"
 next_workspace     = "prefix+down"
+
+# Move between tabs with left/right arrows — completes the compass:
+# up/down = spaces, left/right = tabs. Hammerspoon maps ctrl+j -> Left and
+# ctrl+l -> Right, so in practice: ctrl+a, then ctrl+j (prev tab) / ctrl+l (next tab).
+previous_tab = "prefix+left"
+next_tab     = "prefix+right"
 
 # Close the current space (asks for confirmation by default).
 close_workspace = "prefix+ctrl+w"
