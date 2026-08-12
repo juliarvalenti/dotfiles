@@ -17,5 +17,7 @@ next_workspace     = "prefix+down"
 previous_tab = "prefix+left"
 next_tab     = "prefix+right"
 
-# Close the current space (asks for confirmation by default).
-close_workspace = "prefix+ctrl+w"
+# ctrl+w closes the *tab* (the short-lived thing), matching browser/editor muscle
+# memory. Closing a whole workspace stays on herdr's default prefix+shift+d —
+# deliberate and rarely hit, so a reflexive ctrl+w can't nuke a long-lived space.
+close_tab = "prefix+ctrl+w"
