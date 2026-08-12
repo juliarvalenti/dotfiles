@@ -1,24 +1,20 @@
 {
   "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
-  "logo": {
-    "source": "macOS2"
-  },
+  "logo": { "type": "none" },
   "display": {
-    "separator": "  "
+    "separator": "  ",
+    "key": { "width": 9 },
+    "bar": { "border": { "left": "[", "right": "]" }, "char": { "elapsed": "▰", "total": "▱" }, "width": 10 }
   },
   "modules": [
-    {"type": "custom", "format": ""},
-    {"type": "custom", "format": ""},
-    {"type": "custom", "format": ""},
     "title",
-    "separator",
-    "uptime",
-    "memory",
-    "swap",
-    "disk",
-    "battery",
-    "localip",
-    "separator",
-    "colors"
+    { "type": "separator", "string": "─" },
+    { "type": "os",      "key": " OS",      "keyColor": "blue" },
+    { "type": "uptime",  "key": " Uptime",  "keyColor": "blue" },
+    { "type": "memory",  "key": " Memory",  "keyColor": "magenta", "percent": { "type": 2 } },
+    { "type": "disk",    "key": " Disk",   "keyColor": "magenta", "folders": "/", "percent": { "type": 2 } },
+    { "type": "battery", "key": " Battery", "keyColor": "magenta", "percent": { "type": 2 } },
+    "break",
+    { "type": "colors", "symbol": "circle" }
   ]
 }
