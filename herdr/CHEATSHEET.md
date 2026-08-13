@@ -1,32 +1,32 @@
 # herdr cheat sheet
 
-**Prefix = `ctrl+a`** — press it, then keep `ctrl` held for the next key.
+**Prefix = `ctrl+space`** — press it, then keep `ctrl` held for the next key.
 
 ## Two rules, that's it
 
 1. **Navigate = direction** (the compass): up/down = spaces, left/right = tabs.
 2. **Act = verb + scope**: `n`ew / `r`ename / `w` close · no shift = **tab**, shift = **workspace**.
 
-> Hammerspoon maps `ctrl+i/k/j/l` → arrow keys, so the compass is just `ctrl+a` + `ctrl+IJKL`.
+> Hammerspoon maps `ctrl+i/k/j/l` → arrow keys, so the compass is just `ctrl+space` + `ctrl+IJKL`.
 
 ## Navigate — the compass
 
 | Keys | Does |
 |------|------|
-| `ctrl+a` `ctrl+i` | ⬆ prev **space** |
-| `ctrl+a` `ctrl+k` | ⬇ next **space** |
-| `ctrl+a` `ctrl+j` | ⬅ prev **tab** |
-| `ctrl+a` `ctrl+l` | ➡ next **tab** |
-| `ctrl+a` `1`…`9` | jump to tab N |
-| `ctrl+a` `w`* | space picker (*bare w, herdr default) |
+| `ctrl+space` `ctrl+i` | ⬆ prev **space** |
+| `ctrl+space` `ctrl+k` | ⬇ next **space** |
+| `ctrl+space` `ctrl+j` | ⬅ prev **tab** |
+| `ctrl+space` `ctrl+l` | ➡ next **tab** |
+| `ctrl+space` `1`…`9` | jump to tab N |
+| `ctrl+space` `w`* | space picker (*bare w, herdr default) |
 
 ## Act — verb = letter, shift = workspace
 
 | Action | Tab (no shift) | Workspace (shift) |
 |--------|----------------|-------------------|
-| **New** | `ctrl+a` `ctrl+n` | `ctrl+a` `ctrl+shift+n` |
-| **Rename** | `ctrl+a` `ctrl+r` | `ctrl+a` `ctrl+shift+r` |
-| **Close** | `ctrl+a` `ctrl+w` | `ctrl+a` `ctrl+shift+w` |
+| **New** | `ctrl+space` `ctrl+n` | `ctrl+space` `ctrl+shift+n` |
+| **Rename** | `ctrl+space` `ctrl+r` | `ctrl+space` `ctrl+shift+r` |
+| **Close** | `ctrl+space` `ctrl+w` | `ctrl+space` `ctrl+shift+w` |
 
 Mnemonic: **n/r/w** = new/rename/close. **shift** = "the big one" (workspace).
 
@@ -34,21 +34,21 @@ Mnemonic: **n/r/w** = new/rename/close. **shift** = "the big one" (workspace).
 
 | Keys | Does |
 |------|------|
-| `ctrl+a` `v` | split vertical |
-| `ctrl+a` `-` | split horizontal |
-| `ctrl+a` `h` `j` `k` `l` | focus pane ←↓↑→ (bare letters) |
-| `ctrl+a` `z` | zoom pane |
-| `ctrl+a` `x` | close pane |
+| `ctrl+space` `v` | split vertical |
+| `ctrl+space` `-` | split horizontal |
+| `ctrl+space` `h` `j` `k` `l` | focus pane ←↓↑→ (bare letters) |
+| `ctrl+space` `z` | zoom pane |
+| `ctrl+space` `x` | close pane |
 
 ## App / misc (herdr defaults)
 
 | Keys | Does |
 |------|------|
-| `ctrl+a` `b` | toggle sidebar |
-| `ctrl+a` `?` | help |
-| `ctrl+a` `s` | settings |
-| `ctrl+a` `shift+r`* | reload config (*bare shift+r, herdr default) |
-| `ctrl+a` `q` | detach session |
+| `ctrl+space` `b` | toggle sidebar |
+| `ctrl+space` `?` | help |
+| `ctrl+space` `s` | settings |
+| `ctrl+space` `shift+r`* | reload config (*bare shift+r, herdr default) |
+| `ctrl+space` `q` | detach session |
 
 ## CLI
 

@@ -1,7 +1,9 @@
 # herdr config — overrides only; anything omitted uses herdr's defaults.
 #
 # ── Unified keymap ──────────────────────────────────────────────────────────
-# Prefix: ctrl+a (hold ctrl the whole time; the rest are ctrl chords too).
+# Prefix: ctrl+space (moved off ctrl+a — that byte is 0x01 = terminal "home",
+# which collided with the Hammerspoon cmd+Left home key). Hold ctrl through the
+# following chord.
 #
 # NAVIGATE — the compass (direction = what you move):
 #   ctrl+i / ctrl+k  → prev / next SPACE   (↑ / ↓)
@@ -14,7 +16,7 @@
 # ─────────────────────────────────────────────────────────────────────────────
 
 [keys]
-prefix = "ctrl+a"
+prefix = "ctrl+space"
 
 # Navigate
 previous_workspace = "prefix+up"      # ctrl+i
@@ -35,3 +37,6 @@ close_workspace  = "prefix+ctrl+shift+w"
 [session]
 # After a restart, resume supported agent panes back into their conversations.
 resume_agents_on_restore = true
+
+[ui]
+agent_panel_sort = "priority"
