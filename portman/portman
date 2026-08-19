@@ -1,0 +1,323 @@
+#!/usr/bin/env python3
+"""portman — per-worktree dev-server port leases, reconciled against reality.
+
+The filesystem is the lease table. A worktree claims a slot by writing a
+`.ports.lock` next to its `.ports.toml` manifest; it frees the slot by ceasing
+to exist (delete the worktree, the lock goes with it). There is no central
+registry and no `release` command — a deleted directory has no lock and no live
+process, so its ports vanish from the inventory for free.
+
+Allocation reconciles three live sources instead of trusting stored state:
+  - lsof   : what is actually bound right now
+  - docker : running container host ports (with names)
+  - crawl  : every .ports.lock on the laptop = reservations, running or not
+
+Commands:
+  portman claim     Idempotent. Reuse this worktree's lock, else allocate the
+                    lowest free slot, write .ports.lock, print the assignment.
+  portman env       Emit `export VAR=port` lines (claims first if needed).
+                    Use as: eval "$(portman env)" && pnpm dev
+  portman ls        Whole-laptop inventory: every lock + what's actually live.
+  portman show      This worktree's current assignment.
+
+Config via env:
+  PORTMAN_ROOTS     Colon-separated dirs to crawl for locks.
+                    Default: ~/Documents/GitHub
+"""
+from __future__ import annotations
+
+import json
+import os
+import re
+import subprocess
+import sys
+import tomllib
+from datetime import datetime, timezone
+from pathlib import Path
+
+MANIFEST = ".ports.toml"
+LOCK = ".ports.lock"
+CLAIM_LOCKFILE = Path.home() / ".cache" / "portman" / "claim.lock"
+
+
+# ── discovery ────────────────────────────────────────────────────────────────
+
+def find_manifest(start: Path) -> Path | None:
+    """Walk up from start to the nearest dir containing a .ports.toml."""
+    for d in [start, *start.parents]:
+        if (d / MANIFEST).is_file():
+            return d / MANIFEST
+    return None
+
+
+def crawl_roots() -> list[Path]:
+    raw = os.environ.get("PORTMAN_ROOTS")
+    if raw:
+        return [Path(p).expanduser() for p in raw.split(":") if p]
+    return [Path.home() / "Documents" / "GitHub"]
+
+
+def find_locks() -> list[Path]:
+    """Every .ports.lock under the crawl roots. Missing dirs => already free."""
+    locks: list[Path] = []
+    for root in crawl_roots():
+        if not root.is_dir():
+            continue
+        # Bounded-depth walk; skip heavy/irrelevant trees.
+        skip = {"node_modules", ".git", ".venv", "dist", ".next", "__pycache__"}
+        for dirpath, dirnames, filenames in os.walk(root):
+            depth = len(Path(dirpath).relative_to(root).parts)
+            if depth >= 4:
+                dirnames[:] = []
+            dirnames[:] = [d for d in dirnames if d not in skip]
+            if LOCK in filenames:
+                locks.append(Path(dirpath) / LOCK)
+    return locks
+
+
+# ── live-port inventory ──────────────────────────────────────────────────────
+
+def lsof_ports() -> dict[int, str]:
+    """port -> 'command(pid)' for every listening TCP socket."""
+    out: dict[int, str] = {}
+    try:
+        res = subprocess.run(
+            ["lsof", "-nP", "-iTCP", "-sTCP:LISTEN"],
+            capture_output=True, text=True, timeout=10,
+        )
+    except (OSError, subprocess.SubprocessError):
+        return out
+    for line in res.stdout.splitlines()[1:]:
+        f = line.split()
+        if len(f) < 9:
+            continue
+        cmd, pid, name = f[0], f[1], f[8]
+        m = re.search(r":(\d+)$", name)
+        if m:
+            out.setdefault(int(m.group(1)), f"{cmd}({pid})")
+    return out
+
+
+def docker_ports() -> dict[int, str]:
+    """host port -> 'docker:container' for running published containers."""
+    out: dict[int, str] = {}
+    try:
+        res = subprocess.run(
+            ["docker", "ps", "--format", "{{.Names}}\t{{.Ports}}"],
+            capture_output=True, text=True, timeout=10,
+        )
+    except (OSError, subprocess.SubprocessError):
+        return out
+    if res.returncode != 0:
+        return out
+    for line in res.stdout.splitlines():
+        if "\t" not in line:
+            continue
+        name, ports = line.split("\t", 1)
+        for m in re.finditer(r":(\d+)->", ports):
+            out.setdefault(int(m.group(1)), f"docker:{name}")
+    return out
+
+
+def read_lock(path: Path) -> dict | None:
+    try:
+        return json.loads(path.read_text())
+    except (OSError, ValueError):
+        return None
+
+
+def reserved_ports(exclude_dir: Path | None) -> dict[int, str]:
+    """port -> 'project@slot' from every lock except the one we're recomputing."""
+    out: dict[int, str] = {}
+    for lp in find_locks():
+        if exclude_dir and lp.parent == exclude_dir:
+            continue
+        data = read_lock(lp)
+        if not data:
+            continue
+        tag = f"{data.get('project','?')}@{data.get('slot','?')}"
+        for svc in data.get("services", {}).values():
+            if isinstance(svc.get("port"), int):
+                out.setdefault(svc["port"], tag)
+    return out
+
+
+# ── manifest / allocation ────────────────────────────────────────────────────
+
+def load_manifest(path: Path) -> dict:
+    with path.open("rb") as fh:
+        m = tomllib.load(fh)
+    m.setdefault("project", {}).setdefault("name", path.parent.name)
+    alloc = m.setdefault("allocation", {})
+    alloc.setdefault("stride", 10)
+    alloc.setdefault("min_slot", 1)
+    alloc.setdefault("max_slot", 20)
+    if not m.get("services"):
+        die(f"{path}: no [services] declared")
+    return m
+
+
+def ports_for_slot(manifest: dict, slot: int) -> dict[str, dict]:
+    """Resolve every service's port for a slot: default + slot*stride."""
+    stride = manifest["allocation"]["stride"]
+    services: dict[str, dict] = {}
+    for name, spec in manifest["services"].items():
+        port = spec["default"] + slot * stride
+        entry = {"env": spec["env"], "port": port}
+        if "url_var" in spec:
+            tmpl = spec.get("url_template", "http://localhost:{port}")
+            entry["url_var"] = spec["url_var"]
+            entry["url"] = tmpl.format(port=port)
+        services[name] = entry
+    return services
+
+
+def allocate(manifest: dict, taken: dict[int, str]) -> tuple[int, dict]:
+    alloc = manifest["allocation"]
+    for slot in range(alloc["min_slot"], alloc["max_slot"] + 1):
+        services = ports_for_slot(manifest, slot)
+        clash = [s["port"] for s in services.values() if s["port"] in taken]
+        if not clash:
+            return slot, services
+    die(f"no free slot in [{alloc['min_slot']}..{alloc['max_slot']}] — run `portman ls`")
+
+
+# ── claim (get-or-create) ────────────────────────────────────────────────────
+
+def get_or_claim(quiet: bool = False) -> tuple[Path, dict]:
+    manifest_path = find_manifest(Path.cwd())
+    if not manifest_path:
+        die(f"no {MANIFEST} found walking up from {Path.cwd()}")
+    root = manifest_path.parent
+    lock_path = root / LOCK
+
+    existing = read_lock(lock_path)
+    if existing:
+        return lock_path, existing
+
+    manifest = load_manifest(manifest_path)
+
+    CLAIM_LOCKFILE.parent.mkdir(parents=True, exist_ok=True)
+    with open(CLAIM_LOCKFILE, "w") as guard:
+        _flock(guard)
+        # Re-check under the lock: another process may have just written ours.
+        existing = read_lock(lock_path)
+        if existing:
+            return lock_path, existing
+        taken = {**reserved_ports(root), **lsof_ports(), **docker_ports()}
+        slot, services = allocate(manifest, taken)
+        data = {
+            "project": manifest["project"]["name"],
+            "slot": slot,
+            "path": str(root),
+            "created": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+            "services": services,
+        }
+        tmp = lock_path.with_suffix(".lock.tmp")
+        tmp.write_text(json.dumps(data, indent=2) + "\n")
+        os.replace(tmp, lock_path)
+    if not quiet:
+        eprint(f"portman: claimed slot {slot} for {data['project']} → {root}")
+    return lock_path, data
+
+
+def _flock(fh) -> None:
+    try:
+        import fcntl
+        fcntl.flock(fh, fcntl.LOCK_EX)
+    except (ImportError, OSError):
+        pass  # advisory only; loud EADDRINUSE is the backstop
+
+
+# ── env export lines ─────────────────────────────────────────────────────────
+
+def export_lines(data: dict) -> list[str]:
+    lines: list[str] = []
+    for svc in data["services"].values():
+        lines.append(f"export {svc['env']}={svc['port']}")
+        if "url_var" in svc:
+            lines.append(f"export {svc['url_var']}={svc['url']}")
+    return lines
+
+
+# ── commands ─────────────────────────────────────────────────────────────────
+
+def cmd_claim() -> None:
+    _, data = get_or_claim()
+    print_assignment(data)
+
+
+def cmd_env() -> None:
+    _, data = get_or_claim(quiet=True)
+    print("\n".join(export_lines(data)))
+
+
+def cmd_show() -> None:
+    manifest_path = find_manifest(Path.cwd())
+    if not manifest_path:
+        die(f"no {MANIFEST} found walking up from {Path.cwd()}")
+    data = read_lock(manifest_path.parent / LOCK)
+    if not data:
+        eprint("portman: no .ports.lock here yet — run `portman claim`")
+        sys.exit(1)
+    print_assignment(data)
+
+
+def cmd_ls() -> None:
+    live = {**lsof_ports(), **docker_ports()}
+    locks = sorted(find_locks(), key=lambda p: str(p))
+    if not locks:
+        eprint("portman: no .ports.lock files under " + ":".join(str(r) for r in crawl_roots()))
+    seen_ports: set[int] = set()
+    for lp in locks:
+        data = read_lock(lp)
+        if not data:
+            continue
+        print(f"\n{data.get('project','?')}  slot {data.get('slot','?')}  {data.get('path', lp.parent)}")
+        for name, svc in data.get("services", {}).items():
+            port = svc.get("port")
+            seen_ports.add(port)
+            owner = live.get(port)
+            state = f"LIVE  {owner}" if owner else "idle"
+            print(f"    {name:<12} {port:<7} {state}")
+    orphans = {p: who for p, who in sorted(live.items()) if p not in seen_ports}
+    if orphans:
+        print("\nlive ports with no lease:")
+        for p, who in orphans.items():
+            print(f"    {'?':<12} {p:<7} {who}")
+
+
+def print_assignment(data: dict) -> None:
+    print(f"{data['project']}  slot {data['slot']}  {data['path']}")
+    for name, svc in data["services"].items():
+        extra = f"  {svc['url_var']}={svc['url']}" if "url_var" in svc else ""
+        print(f"    {name:<12} {svc['env']}={svc['port']}{extra}")
+
+
+# ── util ─────────────────────────────────────────────────────────────────────
+
+def eprint(*a) -> None:
+    print(*a, file=sys.stderr)
+
+
+def die(msg: str) -> None:
+    eprint(f"portman: {msg}")
+    sys.exit(1)
+
+
+COMMANDS = {"claim": cmd_claim, "env": cmd_env, "ls": cmd_ls, "show": cmd_show}
+
+
+def main() -> None:
+    args = sys.argv[1:]
+    if not args or args[0] in ("-h", "--help"):
+        print(__doc__)
+        return
+    fn = COMMANDS.get(args[0])
+    if not fn:
+        die(f"unknown command '{args[0]}' — one of: {', '.join(COMMANDS)}")
+    fn()
+
+
+if __name__ == "__main__":
+    main()

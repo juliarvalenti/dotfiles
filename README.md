@@ -8,7 +8,8 @@ Personal config and keybindings.
 | `hammerspoon/` | Hammerspoon text navigation bindings (macOS) |
 | `vscode/` | VS Code keybindings |
 | `zed/` | Zed editor settings |
-| `claude/` | Claude Code keybindings and status line config |
+| `claude/` | Claude Code keybindings, status line config, and skills |
+| `portman/` | Per-worktree dev-server port lease manager |
 | `herdr/` | herdr terminal workspace keybindings |
 | `fastfetch/` | fastfetch config |
 | `ghostty-config` | Ghostty terminal config |
