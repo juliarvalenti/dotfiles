@@ -42,12 +42,67 @@ CLAIM_LOCKFILE = Path.home() / ".cache" / "portman" / "claim.lock"
 
 # ── discovery ────────────────────────────────────────────────────────────────
 
-def find_manifest(start: Path) -> Path | None:
-    """Walk up from start to the nearest dir containing a .ports.toml."""
+def find_manifest(start: Path, stop: Path | None = None) -> Path | None:
+    """Walk up from start to the nearest dir containing a .ports.toml.
+
+    With `stop`, never look above it — so a nested worktree can't sail past
+    itself into a parent repo's manifest.
+    """
     for d in [start, *start.parents]:
         if (d / MANIFEST).is_file():
             return d / MANIFEST
+        if d == stop:
+            break
     return None
+
+
+def git_worktree_dirs(start: Path) -> tuple[Path, Path] | None:
+    """(worktree_top, main_top) for a git checkout, else None.
+
+    For a linked worktree these differ (the manifest is gitignored and lives
+    only in main_top); for the primary clone they're equal.
+    """
+    def git(*a: str) -> str | None:
+        try:
+            r = subprocess.run(
+                ["git", "-C", str(start), *a],
+                capture_output=True, text=True, timeout=5,
+            )
+        except (OSError, subprocess.SubprocessError):
+            return None
+        return r.stdout.strip() if r.returncode == 0 else None
+
+    top = git("rev-parse", "--show-toplevel")
+    common = git("rev-parse", "--path-format=absolute", "--git-common-dir")
+    if not top or not common:
+        return None
+    worktree_top = Path(top)
+    common_dir = Path(common)
+    main_top = common_dir.parent if common_dir.name == ".git" else worktree_top
+    return worktree_top, main_top
+
+
+def resolve_lease(start: Path) -> tuple[Path, Path]:
+    """Locate the (manifest, lease_dir) pair for the current directory.
+
+    The lease_dir owns the `.ports.lock` and is the current git worktree top,
+    so the lease dies when the worktree is removed. In a linked worktree the
+    gitignored manifest may live only in the main worktree — borrow it there.
+    Outside git, fall back to a plain walk-up.
+    """
+    dirs = git_worktree_dirs(start)
+    if dirs is None:
+        mp = find_manifest(start)
+        if not mp:
+            die(f"no {MANIFEST} found walking up from {start}")
+        return mp, mp.parent
+    worktree_top, main_top = dirs
+    mp = find_manifest(start, stop=worktree_top)
+    if not mp and (main_top / MANIFEST).is_file():
+        mp = main_top / MANIFEST
+    if not mp:
+        die(f"no {MANIFEST} in worktree {worktree_top} or main worktree {main_top}")
+    return mp, worktree_top
 
 
 def crawl_roots() -> list[Path]:
@@ -185,10 +240,7 @@ def allocate(manifest: dict, taken: dict[int, str]) -> tuple[int, dict]:
 # ── claim (get-or-create) ────────────────────────────────────────────────────
 
 def get_or_claim(quiet: bool = False) -> tuple[Path, dict]:
-    manifest_path = find_manifest(Path.cwd())
-    if not manifest_path:
-        die(f"no {MANIFEST} found walking up from {Path.cwd()}")
-    root = manifest_path.parent
+    manifest_path, root = resolve_lease(Path.cwd())
     lock_path = root / LOCK
 
     existing = read_lock(lock_path)
@@ -253,10 +305,8 @@ def cmd_env() -> None:
 
 
 def cmd_show() -> None:
-    manifest_path = find_manifest(Path.cwd())
-    if not manifest_path:
-        die(f"no {MANIFEST} found walking up from {Path.cwd()}")
-    data = read_lock(manifest_path.parent / LOCK)
+    _, lease_dir = resolve_lease(Path.cwd())
+    data = read_lock(lease_dir / LOCK)
     if not data:
         eprint("portman: no .ports.lock here yet — run `portman claim`")
         sys.exit(1)
